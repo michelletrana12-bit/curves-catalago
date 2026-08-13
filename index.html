@@ -22,8 +22,13 @@
     --stitch: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px);
   }
   *{box-sizing:border-box;}
+  /* Prevents any single wide element (long email in admin bar, unwrappable text,
+     off-by-a-pixel input) from making iOS Safari zoom the whole page out — the
+     "everything squished into the top-left" bug when the admin bar shows up. */
+  html,body{overflow-x:hidden;max-width:100vw;}
   html{-webkit-text-size-adjust:100%;}
-  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Work Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Work Sans',sans-serif;-webkit-font-smoothing:antialiased;width:100%;}
+  img,svg,video{max-width:100%;height:auto;}
   .wrap{max-width:1100px;margin:0 auto;padding:0 20px;}
   header.top{padding:26px 0 10px;text-align:center;background:var(--blush);}
   .logo-img{max-width:220px;width:60%;height:auto;display:block;margin:0 auto;}
@@ -81,20 +86,25 @@
   .btn-danger{background:var(--danger);color:#fff;}
   .error-msg{color:var(--danger);font-size:0.8rem;margin-bottom:10px;}
 
-  .admin-bar{background:var(--ink);color:var(--cream);text-align:center;padding:10px;font-family:'Space Mono',monospace;font-size:0.75rem;position:sticky;top:0;z-index:40;display:flex;justify-content:center;gap:16px;align-items:center;flex-wrap:wrap;}
-  .admin-bar button{touch-action:manipulation;background:var(--blush-deep);border:none;color:var(--ink);font-weight:700;padding:7px 12px;min-height:34px;border-radius:5px;cursor:pointer;font-size:0.72rem;}
+  .admin-bar{background:var(--ink);color:var(--cream);text-align:center;padding:10px 12px;font-family:'Space Mono',monospace;font-size:0.75rem;position:sticky;top:0;z-index:40;display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap;width:100%;max-width:100%;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word;}
+  .admin-bar > .admin-bar-label{flex:1 1 100%;min-width:0;overflow-wrap:anywhere;}
+  .admin-bar button{touch-action:manipulation;background:var(--blush-deep);border:none;color:var(--ink);font-weight:700;padding:8px 12px;min-height:36px;border-radius:5px;cursor:pointer;font-size:0.72rem;white-space:nowrap;}
+  @media (max-width:480px){
+    .admin-bar{font-size:0.7rem;gap:6px;padding:8px;}
+    .admin-bar button{font-size:0.68rem;padding:7px 10px;min-height:34px;}
+  }
 
-  .admin-panel{max-width:640px;margin:20px auto 60px;background:var(--card);border-radius:6px;padding:22px 24px;}
-  .admin-panel h2{font-family:'Fraunces',serif;font-size:1.2rem;margin-top:0;}
-  .field{margin-bottom:14px;}
+  .admin-panel{max-width:640px;margin:20px auto 60px;background:var(--card);border-radius:6px;padding:22px 24px;width:calc(100% - 20px);box-sizing:border-box;}
+  .admin-panel h2{font-family:'Fraunces',serif;font-size:1.2rem;margin-top:0;overflow-wrap:anywhere;}
+  .field{margin-bottom:14px;min-width:0;}
   .field label{display:block;font-size:0.78rem;font-weight:600;margin-bottom:5px;color:#544f45;}
-  .field input, .field select{width:100%;padding:10px;border:1px solid #cfc7ba;border-radius:5px;font-family:'Work Sans';font-size:16px;}
-  .field-row{display:flex;gap:12px;}
-  .field-row .field{flex:1;}
+  .field input, .field select{width:100%;max-width:100%;padding:10px;border:1px solid #cfc7ba;border-radius:5px;font-family:'Work Sans';font-size:16px;}
+  .field-row{display:flex;gap:12px;min-width:0;}
+  .field-row .field{flex:1;min-width:0;}
   .existing-list{margin-top:24px;}
-  .existing-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #eee6d9;}
-  .existing-row img{width:44px;height:44px;object-fit:cover;border-radius:4px;background:#eee;}
-  .existing-row .info{flex:1;font-size:0.85rem;}
+  .existing-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #eee6d9;min-width:0;}
+  .existing-row img{width:44px;height:44px;flex:0 0 44px;object-fit:cover;border-radius:4px;background:#eee;}
+  .existing-row .info{flex:1;min-width:0;font-size:0.85rem;overflow-wrap:anywhere;}
   .existing-row .info b{font-family:'Fraunces',serif;}
   .loading{text-align:center;padding:60px 20px;font-family:'Space Mono',monospace;color:#a39d90;}
 
@@ -721,7 +731,7 @@ function renderAdminBar(){
   const email = auth && auth.currentUser ? auth.currentUser.email : '';
   host.innerHTML = `
     <div class="admin-bar">
-      Modo administradora activo${email ? ' — ' + email : ''}
+      <div class="admin-bar-label">Modo administradora activo${email ? ' — ' + email : ''}</div>
       <button id="btnChangePass">Cambiar contraseña</button>
       <button id="btnSalirAdmin">Salir</button>
     </div>`;
